@@ -21,9 +21,9 @@
     cursor: pointer;
     font-size: 60px;
     font-family: 'Cormorant SC', serif;
-    user-select: none; 
+    user-select: none;
     -webkit-user-select: none;
-    -moz-user-select: none; 
+    -moz-user-select: none;
     -khtml-user-select: none;
     -ms-user-select: none;
 }
@@ -57,4 +57,8 @@
 
 .wrong {
     color: red;
+}
+
+.hide {
+    display: none;
 }

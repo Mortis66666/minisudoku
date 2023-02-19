@@ -1,44 +1,20 @@
-
 const board = [];
 const cells = document.getElementsByClassName("cell");
+const resetBtn = document.getElementById("reset");
+let solved = false;
 
-
-for (let i = 0; i < 4; i++) {
-    board.push(Array(4).fill(0));
-}
-
+resetBoard();
 randomBoard();
-
-let fixed = new Set();
-let fixedCount = randint(6, 10); // adjust value if n
-
-while (fixed.size < fixedCount) {
-    fixed.add(`[${randint(0, 3)}, ${randint(0, 3)}]`);
-}
-
-for (let fix of fixed) {
-    let [x, y] = eval(fix);
-    let cell = cells[y * 4 + x];
-    cell.classList.add("fixed");
-    cell.innerHTML = board[y][x];
-}
-
-for (let [y, row] of board.entries()) {
-    for (let [x, cell] of row.entries()) {
-        if (!fixed.has(`[${x}, ${y}]`)) {
-            board[y][x] = 0;
-        }
-    }
-}
+createPuzzle();
 
 for (let cell of cells) {
-    cell.addEventListener('click', () => {
-        
-        if (!cell.classList.contains('fixed')) {
+    cell.onclick = () => {
+        if (solved) return;
+        if (!cell.classList.contains("fixed")) {
             let f = +cell.id;
             let x = f % 4;
             let y = Math.floor(f / 4);
-    
+
             let newVal = ((+cell.innerHTML || 0) + 1) % 5 || 1;
             cell.innerHTML = newVal;
 
@@ -46,7 +22,7 @@ for (let cell of cells) {
 
             if (isValid(board, x, y, newVal)) {
                 cell.classList.add("correct");
-                cell.classList.remove("wrong")
+                cell.classList.remove("wrong");
             } else {
                 cell.classList.add("wrong");
                 cell.classList.remove("correct");
@@ -54,12 +30,27 @@ for (let cell of cells) {
 
             board[y][x] = newVal;
         }
-    });
+    };
 }
 
+resetBtn.onclick = () => {
+    resetBoard();
+    randomBoard();
+    createPuzzle();
+    resetBtn.classList.add("hide");
+    solved = false;
+};
 
+function resetBoard() {
+    board.length = 0;
+    for (let i = 0; i < 4; i++) {
+        board.push(Array(4).fill(0));
+    }
 
-
+    for (let cell of cells) {
+        cell.className = "cell";
+    }
+}
 
 function randomBoard() {
     let [x, y] = findEmpty(board);
@@ -68,7 +59,7 @@ function randomBoard() {
         return true;
     }
 
-    for (let n of [1, 2, 3, 4].sort(() => Math.random() - .5)) {
+    for (let n of [1, 2, 3, 4].sort(() => Math.random() - 0.5)) {
         if (isValid(board, x, y, n)) {
             board[y][x] = n;
 
@@ -83,6 +74,30 @@ function randomBoard() {
     return false;
 }
 
+function createPuzzle() {
+    let fixed = new Set();
+    let fixedCount = randint(6, 10); // adjust value if n
+
+    while (fixed.size < fixedCount) {
+        fixed.add(`[${randint(0, 3)}, ${randint(0, 3)}]`);
+    }
+
+    for (let fix of fixed) {
+        let [x, y] = eval(fix);
+        let cell = cells[y * 4 + x];
+        cell.classList.add("fixed");
+        cell.innerHTML = board[y][x];
+    }
+
+    for (let [y, row] of board.entries()) {
+        for (let [x, cell] of row.entries()) {
+            if (!fixed.has(`[${x}, ${y}]`)) {
+                board[y][x] = 0;
+                cells[y * 4 + x].innerHTML = "";
+            }
+        }
+    }
+}
 
 function findEmpty(board) {
     for (let y = 0; y < 4; y++) {
@@ -131,11 +146,8 @@ function getBox(x, y) {
 }
 
 function randint(min, max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
-
-var solved = false;
 
 setInterval(() => {
     if (!solved) {
@@ -156,6 +168,6 @@ setInterval(() => {
 
         alert("Congrats u solved it!");
         solved = true;
+        resetBtn.classList.remove("hide");
     }
-
 }, 1000);
